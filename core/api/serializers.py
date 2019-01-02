@@ -7,6 +7,7 @@ from atracoes.api.serializers import AtracaoSerializer
 from enderecos.api.serializers import EnderecoSerializer
 from comentarios.api.serializers import ComentarioSerializer
 from avaliacoes.api.serializers import AvaliacaoSerializer
+from enderecos.models import Endereco
 
 
 class PontoTuristicoSerializer(ModelSerializer):
@@ -32,8 +33,17 @@ class PontoTuristicoSerializer(ModelSerializer):
     def create(self, validated_data):
         atracoes = validated_data('atracoes')
         del validated_data['atracoes']
+
+        endereco = validated_data['endereco']
+        del validated_data['endereco']
+
         ponto = PontoTuristico.objects.create(**validated_data)
         self.cria_atracoes(atracoes, ponto)
+
+        end = Endereco.objects.create(**endereco)
+        ponto.endereco = end
+
+        ponto.save()
 
         return ponto
 
